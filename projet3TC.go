@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/wo0lien/projet3TC/filters/edge"
 	"github.com/wo0lien/projet3TC/filters/grayscale"
+	"github.com/wo0lien/projet3TC/imageTools/cutter"
 	"image"
 	"log"
 	"os"
@@ -23,7 +24,7 @@ func main() {
 	infile, err := os.Open(filename)
 
 	if err != nil {
-		log.Printf("failed opening %s: %s", filename, err)
+		log.Printf("failed opening file: %s", err)
 		panic(err.Error())
 	}
 	defer infile.Close()
@@ -33,6 +34,11 @@ func main() {
 		panic(err.Error())
 	}
 
-	grayscale.GrayFilter(imgSrc)
+	// grayscale.GrayFilter(imgSrc)
 
+	slices := cutter.Cut(imgSrc)
+
+	for _, slice := range slices {
+		grayscale.GrayFilter(slice)
+	}
 }
