@@ -61,7 +61,7 @@ func Rebuild(t [][]image.Image) image.Image {
 	ymax := 0
 	for y := 0; y < len(t); y++ {
 		ymax = ymax + t[y][0].Bounds().Dy()
-		for x := 0; x < len(t[x]); x++ {
+		for x := 0; x < len(t[y]); x++ {
 			xmax = xmax + t[y][x].Bounds().Dx()
 		}
 	}
@@ -76,7 +76,7 @@ func Rebuild(t [][]image.Image) image.Image {
 	for y := 0; y < len(t); y++ {
 		xi = 0
 		yi = yi + t[y][0].Bounds().Dy()
-		for x := 0; x < len(t[x]); x++ {
+		for x := 0; x < len(t[y]); x++ {
 			pi := image.Point{xi, yi}
 			ri := image.Rectangle{pi, pi.Add(t[x][y].Bounds().Size())}
 
@@ -92,21 +92,21 @@ func Rebuild(t [][]image.Image) image.Image {
 /*
 Open is a function to open a file as image
 */
-func Open(filepath string) image.Image {
+func Open(filepath string) (image.Image, error) {
 
 	infile, err := os.Open(filepath)
 
 	if err != nil {
 		log.Printf("failed opening file: %s", err)
-		panic(err.Error())
+		return nil, err
 	}
 	defer infile.Close()
 
 	img, _, err := image.Decode(infile)
 	if err != nil {
-		panic(err.Error())
+		return nil, err
 	}
-	return img
+	return img, nil
 }
 
 /*
