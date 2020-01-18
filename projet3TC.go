@@ -41,8 +41,8 @@ func main() {
 
 	slices := imagetools.Cut(imgSrc, numCPU)
 
-	for _, slice := range slices {
-		grayscale.GrayFilter(slice)
+	for i := range slices {
+		grayscale.GrayFilter(slices[i][0])
 	}
 
 	img, err := imagetools.Open("assets/test.png")
@@ -55,9 +55,12 @@ func main() {
 	t := imagetools.Cut(img, 9)
 
 	for i := range t {
-		t[i] = edge.FSobel(t[i])
+		for j := range t[i] {
+			t[i][j] = edge.FSobel(t[i][j])
+		}
 	}
 
 	result := imagetools.Rebuild(t)
 
+	imagetools.Export(result, "result.png")
 }
