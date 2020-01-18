@@ -1,21 +1,20 @@
 package imagetools
 
 import (
+	"github.com/oliamb/cutter"
 	"image"
 	"image/draw"
 	"image/png"
 	"log"
 	"math"
 	"os"
-
-	"github.com/oliamb/cutter"
 )
 
 /*
 Cut slice image using the computer CPUNumber
 return a slice of images
 */
-func Cut(img image.Image, nbSplit int) []image.Image {
+func Cut(img image.Image, nbSplit int) [][]image.Image {
 
 	//traitements sur l'image
 	bounds := img.Bounds()
@@ -23,7 +22,10 @@ func Cut(img image.Image, nbSplit int) []image.Image {
 
 	slice := int(math.Floor(float64(h) / float64(nbSplit)))
 
-	slices := make([]image.Image, nbSplit+1)
+	slices := make([][]image.Image, nbSplit+1)
+	for y := range slices {
+		slices[y] = make([]image.Image, 1)
+	}
 
 	cpt := 0
 	for y := 0; y < h; y = y + slice {
@@ -39,10 +41,8 @@ func Cut(img image.Image, nbSplit int) []image.Image {
 			log.Printf("Error while slicing the image")
 			panic(err.Error())
 		}
-		//z := strconv.Itoa(y)
-		//name := "slice" + z
-		//exportImage(imgSliced, name)
-		slices[cpt] = imgSliced
+
+		slices[cpt][0] = imgSliced
 		cpt++
 	}
 

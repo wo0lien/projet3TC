@@ -2,7 +2,6 @@ package imagetools
 
 import (
 	"image"
-	"log"
 	"os"
 	"reflect"
 	"strconv"
@@ -85,24 +84,17 @@ func TestCut(t *testing.T) {
 
 	slices := Cut(img, 3)
 
-	sumh := 0
-	sumw := 0
-
-	for i, slice := range slices {
-
-		b := slice.Bounds()
-		ws, hs := b.Max.X, b.Max.Y
-		log.Printf(strconv.Itoa(hs))
-		sumw = ws
-		sumh = hs //pas propre
-
-		Export(slice, "slice"+strconv.Itoa(i)+".png")
+	for i := range slices {
+		Export(slices[i][0], "slice"+strconv.Itoa(i)+".png")
 	}
 
-	if w != sumw {
+	lastSlice := slices[len(slices)-1][0]
+	b := lastSlice.Bounds()
+
+	if w != b.Max.X {
 		t.Error("Pas la bonne largeur")
 	}
-	if h != sumh {
+	if h != b.Max.Y {
 		t.Error("Pas la bonne hauteur")
 	}
 }
