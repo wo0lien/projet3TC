@@ -75,15 +75,15 @@ func Rebuild(t [][]image.Image) image.Image {
 
 	for y := 0; y < len(t); y++ {
 		xi = 0
-		yi = yi + t[y][0].Bounds().Dy()
 		for x := 0; x < len(t[y]); x++ {
 			pi := image.Point{xi, yi}
-			ri := image.Rectangle{pi, pi.Add(t[x][y].Bounds().Size())}
+			ri := image.Rectangle{pi, pi.Add(t[y][x].Bounds().Size())}
 
-			draw.Draw(rgba, ri, t[x][y], image.Point{0, 0}, draw.Src)
+			draw.Draw(rgba, ri, t[y][x], image.Point{0, 0}, draw.Src)
 
 			xi = xi + t[y][x].Bounds().Dx()
 		}
+		yi = yi + t[y][0].Bounds().Dy()
 	}
 
 	return rgba
