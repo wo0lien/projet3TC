@@ -7,7 +7,7 @@ import (
 )
 
 func TestNoise(t *testing.T) {
-	img, err := imagetools.Open("../../imagetools/composed.png")
+	img, err := imagetools.Open("../../bruit2.png")
 
 	if err != nil {
 		t.Error("open does not work")
