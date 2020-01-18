@@ -1,7 +1,7 @@
 package noise
 
 import (
-	"github.com/wo0lien/filters/uint32slice"
+	"github.com/wo0lien/projet3TC/filters/noise/uint32slice"
 	"image"
 	"image/color"
 	"math"
