@@ -98,3 +98,13 @@ func TestCut(t *testing.T) {
 		t.Error("Pas la bonne hauteur")
 	}
 }
+
+func TestCrop(t *testing.T) {
+	img, _ := Open("../assets/test.png")
+
+	slices := Crop(img, 3)
+
+	for i := range slices {
+		Export(slices[i][0], "slice"+strconv.Itoa(i)+".png")
+	}
+}
