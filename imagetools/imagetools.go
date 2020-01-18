@@ -27,12 +27,10 @@ func Cut(img image.Image, nbSplit int) []image.Image {
 
 	cpt := 0
 	for y := 0; y < h; y = y + slice {
-
-		ymax := min(y+slice, h)
 		// create an image copy of the slice
 		imgSliced, err := cutter.Crop(img, cutter.Config{
 			Width:   w,
-			Height:  ymax - y,
+			Height:  min(slice, h-y),
 			Anchor:  image.Point{0, y},
 			Options: cutter.Copy,
 		})
