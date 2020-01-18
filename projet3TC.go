@@ -52,10 +52,10 @@ func main() {
 		panic(err.Error())
 	}
 
-	t := imagetools.Cut(img, 9)
+	t := imagetools.Cut(img, 4)
 
 	for i := range t {
-		for j := range t[i] {
+		for j := 0; j < len(t[i]); j++ {
 			t[i][j] = edge.FSobel(t[i][j])
 		}
 	}
