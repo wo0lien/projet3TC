@@ -66,7 +66,7 @@ func TestRebuild(t *testing.T) {
 	w, h := bounds.Max.X, bounds.Max.Y
 
 	if w != wimg*wrepeat {
-		t.Error("Pas la bonne largeur width")
+		t.Error("Pas la bonne largeur")
 	}
 
 	if h != himg*hrepeat {
