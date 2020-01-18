@@ -44,4 +44,20 @@ func main() {
 	for _, slice := range slices {
 		grayscale.GrayFilter(slice)
 	}
+
+	img, err := imagetools.Open("assets/test.png")
+
+	if err != nil {
+		log.Printf("failed opening file: %s", err)
+		panic(err.Error())
+	}
+
+	t := imagetools.Cut(img, 9)
+
+	for i := range t {
+		t[i] = edge.FSobel(t[i])
+	}
+
+	result := imagetools.Rebuild(t)
+
 }
