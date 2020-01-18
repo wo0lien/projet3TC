@@ -1,3 +1,5 @@
+package uint32slice
+
 // Copyright 2016 Rafael Lorandi <coolparadox@gmail.com>
 // This file is part of uint32slice, a generic value storage library
 // for the Go language.
@@ -19,7 +21,6 @@
 Package uint32slice is an implementation of sort.Interface for slices of
 uint32s.
 */
-package uint32slice
 
 import "sort"
 
