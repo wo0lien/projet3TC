@@ -7,7 +7,6 @@ import (
 	"log"
 	"math"
 	"os"
-	"runtime"
 
 	"github.com/oliamb/cutter"
 )
@@ -16,16 +15,15 @@ import (
 Cut slice image using the computer CPUNumber
 return a slice of images
 */
-func Cut(img image.Image) []image.Image {
+func Cut(img image.Image, nbSplit int) []image.Image {
 
 	//traitements sur l'image
 	bounds := img.Bounds()
 	w, h := bounds.Max.X, bounds.Max.Y
 
-	var numCPU = runtime.NumCPU()
-	slice := int(math.Floor(float64(h) / float64(numCPU)))
+	slice := int(math.Floor(float64(h) / float64(nbSplit)))
 
-	slices := make([]image.Image, numCPU+1)
+	slices := make([]image.Image, nbSplit+1)
 
 	cpt := 0
 	for y := 0; y < h; y = y + slice {

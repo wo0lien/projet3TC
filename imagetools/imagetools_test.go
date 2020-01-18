@@ -75,3 +75,7 @@ func TestRebuild(t *testing.T) {
 
 	Export(composed, "composed.png")
 }
+
+func TestCut(t *testing.T) {
+
+}

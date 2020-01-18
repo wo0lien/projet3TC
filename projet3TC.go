@@ -8,6 +8,7 @@ import (
 	"image"
 	"log"
 	"os"
+	"runtime"
 )
 
 /*
@@ -36,7 +37,9 @@ func main() {
 
 	// grayscale.GrayFilter(imgSrc)
 
-	slices := imagetools.Cut(imgSrc)
+	var numCPU = runtime.NumCPU()
+
+	slices := imagetools.Cut(imgSrc, numCPU)
 
 	for _, slice := range slices {
 		grayscale.GrayFilter(slice)
