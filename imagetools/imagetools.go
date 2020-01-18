@@ -53,13 +53,6 @@ func Cut(img image.Image) []image.Image {
 	return slices
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
 /*
 Rebuild function to create a big image with smaller ones
 */
@@ -130,4 +123,11 @@ func Export(img image.Image, name string) {
 	}
 	defer newfile.Close()
 	png.Encode(newfile, img)
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
