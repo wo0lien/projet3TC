@@ -1,11 +1,14 @@
-package rebuild
+package rebuilder
 
 import (
 	"image"
 	"image/draw"
 )
 
-func Build(t [][]image.Image) image.Image {
+/*
+Rebuild function to create a big image with smaller ones
+*/
+func Rebuild(t [][]image.Image) image.Image {
 	xmax := 0
 	ymax := 0
 	for y := 0; y < len(t); y++ {
