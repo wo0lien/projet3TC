@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/wo0lien/projet3TC/filters/edge"
 	"github.com/wo0lien/projet3TC/filters/grayscale"
-	"github.com/wo0lien/projet3TC/imageTools/cutter"
+	"github.com/wo0lien/projet3TC/imagetools"
 	"image"
 	"log"
 	"os"
@@ -36,7 +36,7 @@ func main() {
 
 	// grayscale.GrayFilter(imgSrc)
 
-	slices := cutter.Cut(imgSrc)
+	slices := imagetools.Cut(imgSrc)
 
 	for _, slice := range slices {
 		grayscale.GrayFilter(slice)
