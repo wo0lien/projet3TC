@@ -61,9 +61,9 @@ func Rebuild(t [][]image.Image) image.Image {
 	ymax := 0
 	for y := 0; y < len(t); y++ {
 		ymax = ymax + t[y][0].Bounds().Dy()
-		for x := 0; x < len(t[y]); x++ {
-			xmax = xmax + t[y][x].Bounds().Dx()
-		}
+	}
+	for x := 0; x < len(t[0]); x++ {
+		xmax = xmax + t[0][x].Bounds().Dx()
 	}
 	//rectangle for the big image
 	r := image.Rectangle{image.Point{0, 0}, image.Point{xmax, ymax}}
