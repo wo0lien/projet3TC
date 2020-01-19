@@ -76,7 +76,7 @@ func Rebuild(t [][]image.Image) image.Image {
 			pi := image.Point{xi, yi}
 			ri := image.Rectangle{pi, pi.Add(t[y][x].Bounds().Size())}
 
-			draw.Draw(rgba, ri, t[y][x], image.Point{0, 0}, draw.Src)
+			draw.Draw(rgba, ri, t[y][x], image.Point{0, yi}, draw.Src)
 
 			xi = xi + t[y][x].Bounds().Dx()
 		}
