@@ -1,10 +1,12 @@
 package noise
 
 import (
-	"github.com/wo0lien/projet3TC/filters/uint32slice"
 	"image"
 	"image/color"
 	"math"
+
+	"github.com/wo0lien/projet3TC/filters/uint32slice"
+	"github.com/wo0lien/projet3TC/imagetools"
 )
 
 // Fmediane utile
@@ -42,24 +44,23 @@ func Fmediane(in image.Image, p int) image.Image {
 }
 
 // Fmean utile
-func Fmean(in image.Image, p int) image.Image {
-	loadedImage := in
+func Fmean(img image.Image, p int) image.Image {
 
-	b := loadedImage.Bounds()
-	imgWidth := b.Max.X
-	imgHeight := b.Max.Y
-	myImage := image.NewRGBA(image.Rect(0, 0, imgWidth-2*p, imgHeight-2*p))
+	b := img.Bounds()
+	minx, miny := b.Min.X, b.Min.Y
+	maxx, maxy := b.Max.X, b.Max.Y
+	myImage := image.NewRGBA(image.Rect(minx, miny, maxx-2*p, maxy-2*p))
 	var valred uint32
 	var valgreen uint32
 	var valblue uint32
 
-	for cpt := p; cpt < imgWidth-p; cpt++ {
-		for cpt2 := p; cpt2 < imgHeight-p; cpt2++ {
+	for cpt := minx + p; cpt < maxx-p; cpt++ {
+		for cpt2 := miny + p; cpt2 < maxy-p; cpt2++ {
 			i := 0
 			valred, valgreen, valblue = 0, 0, 0
 			for cptwi := -p; cptwi < p+1; cptwi++ {
 				for cpthe := -p; cpthe < p+1; cpthe++ {
-					red, green, blue, _ := loadedImage.At(cpt+cptwi, cpt2+cpthe).RGBA()
+					red, green, blue, _ := img.At(cpt+cptwi, cpt2+cpthe).RGBA()
 					valred, valgreen, valblue = valred+red, valgreen+green, valblue+blue
 					i++
 				}
@@ -71,4 +72,42 @@ func Fmean(in image.Image, p int) image.Image {
 	}
 	return myImage
 
+}
+
+//-----Beginning fo the concurrent part
+
+type portion struct {
+	id  int
+	img image.Image
+}
+
+/*
+ConcurrentFmean Return the image with less noise and compute concurrently
+*/
+func ConcurrentFmean(imgSrc image.Image, p int) image.Image {
+
+	out := make(chan portion)
+	slices := imagetools.Crop(imgSrc, 4)
+
+	for i := 0; i < 4; i++ {
+		go gsWorker(i, p, out, slices[i][0])
+	}
+
+	for i := 0; i < 4; i++ {
+		slice := <-out
+		slices[slice.id][0] = slice.img
+	}
+
+	imgEnd := imagetools.Rebuild(slices)
+
+	return imgEnd
+
+}
+
+func gsWorker(id int, p int, out chan portion, img image.Image) {
+	imgOut := Fmean(img, p)
+	var ret portion
+	ret.img = imgOut
+	ret.id = id
+	out <- ret
 }
