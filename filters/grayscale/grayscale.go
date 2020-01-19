@@ -9,7 +9,7 @@ import (
 )
 
 /*
-ConcurrentGrayFilter Return the grayscale of an image
+GrayFilter Return the grayscale of an image
 */
 func GrayFilter(imgSrc image.Image) image.Image {
 
@@ -34,6 +34,8 @@ func GrayFilter(imgSrc image.Image) image.Image {
 
 	return grayScale
 }
+
+//------ Beginning of the concurrent part
 
 type portion struct {
 	id  int

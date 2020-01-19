@@ -1,2 +1,3 @@
-slice*
-export*
+*.jpg
+*.png
+!assets/*.png

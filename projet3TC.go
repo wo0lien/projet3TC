@@ -27,7 +27,7 @@ func main() {
 }
 
 func useGrayScaleFilter() {
-	imgSrc, err := imagetools.Open("edges.png")
+	imgSrc, err := imagetools.Open("epice.png")
 
 	if err != nil {
 		log.Printf("error loading file")
