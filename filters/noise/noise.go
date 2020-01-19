@@ -90,7 +90,7 @@ func ConcurrentFmean(imgSrc image.Image, p int) image.Image {
 	slices := imagetools.Crop(imgSrc, 4)
 
 	for i := 0; i < 4; i++ {
-		go gsWorker(i, p, out, slices[i][0])
+		go meanWorker(i, p, out, slices[i][0])
 	}
 
 	for i := 0; i < 4; i++ {
@@ -104,7 +104,7 @@ func ConcurrentFmean(imgSrc image.Image, p int) image.Image {
 
 }
 
-func gsWorker(id int, p int, out chan portion, img image.Image) {
+func meanWorker(id int, p int, out chan portion, img image.Image) {
 	imgOut := Fmean(img, p)
 	var ret portion
 	ret.img = imgOut
