@@ -21,8 +21,8 @@ func main() {
 	var _ = edge.FSobel
 	var _ = grayscale.GrayFilter
 
-	//testGrayScale()
-	testEdge()
+	testGrayScale()
+	//testEdge()
 
 }
 
