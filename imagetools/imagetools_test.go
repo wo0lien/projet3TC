@@ -122,8 +122,8 @@ func TestCropChev(t *testing.T) {
 func TestRebuildChev(t *testing.T) {
 
 	img, _ := Open("../assets/lines.png")
-	slices := CropChevauchement(img, 3, 30)
-	imgOut := RebuildChevauchement(slices, 30)
+	slices := CropChevauchement(img, 8, 6)
+	imgOut := RebuildChevauchement(slices, 6)
 	Export(imgOut, "rebuildchev.png")
 
 }

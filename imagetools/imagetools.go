@@ -121,6 +121,9 @@ func RebuildChevauchement(t [][]image.Image, pixs int) image.Image {
 			xi = xi + t[y][x].Bounds().Dx()
 		}
 		yi = yi + t[y][0].Bounds().Dy() - pixs
+		if y == 0 {
+			yi += int(pixs / 2)
+		}
 	}
 
 	return rgba
@@ -224,7 +227,7 @@ func CropChevauchement(img image.Image, nbSplit int, pixs int) [][]image.Image {
 	for y := 0; y < h; y = y + slice {
 
 		//create a subImage
-		rect := image.Rect(0, y, w, min(y+slice+pixs, h))
+		rect := image.Rect(0, max(0, y-pixs), w, min(y+slice, h))
 		imgSliced, _ := cropImage(img, rect)
 
 		slices[cpt][0] = imgSliced
@@ -273,4 +276,11 @@ func min(a, b int) int {
 		return a
 	}
 	return b
+}
+
+func max(a, b int) int {
+	if a < b {
+		return b
+	}
+	return a
 }
