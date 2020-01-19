@@ -23,7 +23,7 @@ func main() {
 }
 
 func testEdge2() {
-	imgSrc, err := imagetools.Open("epice.png")
+	imgSrc, err := imagetools.Open("edges.png")
 
 	if err != nil {
 		log.Printf("error loading file")
@@ -31,10 +31,9 @@ func testEdge2() {
 
 	slices := imagetools.Crop(imgSrc, 4)
 
-	for i := range slices {
+	for i := 0; i < 4; i++ {
 		log.Printf("one filter")
 		slices[i][0] = edge.FSobel(slices[i][0])
-		log.Printf("one export")
 	}
 	imgEnd := imagetools.Rebuild(slices)
 	imagetools.Export(imgEnd, "export.png")

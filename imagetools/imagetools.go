@@ -1,13 +1,14 @@
 package imagetools
 
 import (
-	"github.com/oliamb/cutter"
 	"image"
 	"image/draw"
 	"image/png"
 	"log"
 	"math"
 	"os"
+
+	"github.com/oliamb/cutter"
 )
 
 /*
@@ -55,7 +56,7 @@ Rebuild function to create a big image with smaller ones
 func Rebuild(t [][]image.Image) image.Image {
 	xmax := 0
 	ymax := 0
-	for y := 0; y < len(t); y++ {
+	for y := 0; y < len(t); y++ { // compte le nombre de colonnes
 		ymax = ymax + t[y][0].Bounds().Dy()
 	}
 	for x := 0; x < len(t[0]); x++ {
@@ -69,9 +70,9 @@ func Rebuild(t [][]image.Image) image.Image {
 	xi := 0
 	yi := 0
 
-	for y := 0; y < len(t); y++ {
+	for y := 0; y < len(t); y++ { //y utilisé en hauteur
 		xi = 0
-		for x := 0; x < len(t[y]); x++ {
+		for x := 0; x < len(t[y]); x++ { //x utilisé en largeur
 			pi := image.Point{xi, yi}
 			ri := image.Rectangle{pi, pi.Add(t[y][x].Bounds().Size())}
 

@@ -38,7 +38,7 @@ func TestExport(t *testing.T) {
 func TestRebuild(t *testing.T) {
 	img, err := Open("../assets/test.png")
 
-	wrepeat := 3
+	wrepeat := 1
 	hrepeat := 4
 
 	imgbounds := img.Bounds()
