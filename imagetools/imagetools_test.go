@@ -108,3 +108,22 @@ func TestCrop(t *testing.T) {
 		Export(slices[i][0], "slice"+strconv.Itoa(i)+".png")
 	}
 }
+
+func TestCropChev(t *testing.T) {
+	img, _ := Open("../assets/test.png")
+
+	slices := CropChevauchement(img, 3, 30)
+
+	for i := range slices {
+		Export(slices[i][0], "slice"+strconv.Itoa(i)+".png")
+	}
+}
+
+func TestRebuildChev(t *testing.T) {
+
+	img, _ := Open("../assets/lines.png")
+	slices := CropChevauchement(img, 3, 30)
+	imgOut := RebuildChevauchement(slices, 30)
+	Export(imgOut, "rebuildchev.png")
+
+}

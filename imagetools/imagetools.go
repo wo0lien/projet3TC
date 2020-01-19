@@ -88,6 +88,45 @@ func Rebuild(t [][]image.Image) image.Image {
 }
 
 /*
+RebuildChevauchement function pour refabriquer une image a partir de petites et d'un chevauchement
+*/
+func RebuildChevauchement(t [][]image.Image, pixs int) image.Image {
+	xmax := 0
+	ymax := 0
+	for y := 0; y < len(t); y++ { // compte le nombre de colonnes
+		ymax = ymax + t[y][0].Bounds().Dy()
+	}
+	// on enleve le chevauchement
+	ymax -= pixs * (len(t) - 1)
+	for x := 0; x < len(t[0]); x++ {
+		xmax = xmax + t[0][x].Bounds().Dx()
+	}
+	//pas de chevauchement en x
+	//rectangle for the big image
+	r := image.Rectangle{image.Point{0, 0}, image.Point{xmax, ymax}}
+
+	rgba := image.NewRGBA(r)
+
+	xi := 0
+	yi := 0
+
+	for y := 0; y < len(t); y++ { //y utilisé en hauteur
+		xi = 0
+		for x := 0; x < len(t[y]); x++ { //x utilisé en largeur
+			pi := image.Point{xi, yi}
+			ri := image.Rectangle{pi, pi.Add(t[y][x].Bounds().Size())}
+
+			draw.Draw(rgba, ri, t[y][x], image.Point{0, yi}, draw.Src)
+
+			xi = xi + t[y][x].Bounds().Dx()
+		}
+		yi = yi + t[y][0].Bounds().Dy() - pixs
+	}
+
+	return rgba
+}
+
+/*
 Open is a function to open a file as image
 */
 func Open(filepath string) (image.Image, error) {
@@ -124,7 +163,7 @@ func Export(img image.Image, name string) {
 }
 
 /*
-Crop l'image en une multitude de fonctions
+Crop l'image en plusieurs images
 */
 func Crop(img image.Image, nbSplit int) [][]image.Image {
 	//traitements sur l'image
@@ -150,6 +189,42 @@ func Crop(img image.Image, nbSplit int) [][]image.Image {
 
 		//create a subImage
 		rect := image.Rect(0, y, w, min(y+slice, h))
+		imgSliced, _ := cropImage(img, rect)
+
+		slices[cpt][0] = imgSliced
+		cpt++
+	}
+
+	return slices
+}
+
+/*
+CropChevauchement crop l'image en plusieurs images avec un chaevauchement entre elles
+*/
+func CropChevauchement(img image.Image, nbSplit int, pixs int) [][]image.Image {
+	//traitements sur l'image
+	bounds := img.Bounds()
+	w, h := bounds.Max.X, bounds.Max.Y
+
+	slice := int(math.Floor(float64(h) / float64(nbSplit)))
+
+	//Si on est dans le cas ou la division n'est pas entiere
+	if h%nbSplit != 0 {
+		slice++
+	}
+
+	//handle case where h = nbSplit * slice
+	slices := make([][]image.Image, nbSplit)
+	for y := range slices {
+		slices[y] = make([]image.Image, 1)
+	}
+
+	cpt := 0
+
+	for y := 0; y < h; y = y + slice {
+
+		//create a subImage
+		rect := image.Rect(0, y, w, min(y+slice+pixs, h))
 		imgSliced, _ := cropImage(img, rect)
 
 		slices[cpt][0] = imgSliced

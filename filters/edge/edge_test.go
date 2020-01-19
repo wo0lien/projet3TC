@@ -6,8 +6,8 @@ import (
 	"github.com/wo0lien/projet3TC/imagetools"
 )
 
-func TestEdge(t *testing.T) {
-	img, err := imagetools.Open("../../imagetools/composed.png")
+func TestEdgeFilter(t *testing.T) {
+	img, err := imagetools.Open("../../assets/edges.png")
 
 	if err != nil {
 		t.Error("open does not work")
@@ -15,5 +15,17 @@ func TestEdge(t *testing.T) {
 
 	result := FSobel(img)
 
-	imagetools.Export(result, "edge.png")
+	imagetools.Export(result, "edges.png")
+}
+
+func TestConcurrentEdgeFilter(t *testing.T) {
+	img, err := imagetools.Open("../../assets/edges.png")
+
+	if err != nil {
+		t.Error("open does not work")
+	}
+
+	result := ConcurrentEdgeFilter(img)
+
+	imagetools.Export(result, "concugrayfilterexport.png")
 }

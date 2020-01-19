@@ -17,7 +17,7 @@ func TestGrayFilter(t *testing.T) {
 	imagetools.Export(result, "grayfilterexport.png")
 }
 
-func TestConcurrentHrayFilter(t *testing.T) {
+func TestConcurrentGrayFilter(t *testing.T) {
 	img, err := imagetools.Open("../../epice.png")
 
 	if err != nil {
