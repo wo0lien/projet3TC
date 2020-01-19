@@ -1,6 +1,7 @@
 package imagetools
 
 import (
+	"fmt"
 	"image"
 	"image/draw"
 	"image/png"
@@ -172,6 +173,7 @@ func cropImage(img image.Image, cropRect image.Rectangle) (cropImg image.Image, 
 		// since SubImage (usually) shares underlying pixel.
 		cropImg = p.SubImage(cropRect)
 	} else if cropRect = cropRect.Intersect(img.Bounds()); !cropRect.Empty() {
+		fmt.Println("else")
 		// If `img` does not implement `SubImage`,
 		// copy (and silently convert) the image portion to RGBA image.
 		rgbaImg := image.NewRGBA(cropRect)
