@@ -21,12 +21,12 @@ func main() {
 	var _ = edge.FSobel
 	var _ = grayscale.GrayFilter
 
-	testGrayScale()
-	//testEdge()
+	useGrayScaleFilter()
+	//edgeFilter()
 
 }
 
-func testGrayScale() {
+func useGrayScaleFilter() {
 	imgSrc, err := imagetools.Open("edges.png")
 
 	if err != nil {
@@ -45,7 +45,7 @@ func testGrayScale() {
 	imagetools.Export(imgEnd, "export.png")
 }
 
-func testEdge() {
+func edgeFilter() {
 	imgSrc, err := imagetools.Open("edges.png")
 
 	if err != nil {

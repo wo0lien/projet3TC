@@ -4,8 +4,13 @@ import (
 	"image"
 	"image/color"
 	"math"
+
+	"github.com/wo0lien/projet3TC/imagetools"
 )
 
+/*
+ConcurrentGrayFilter Return the grayscale of an image
+*/
 func GrayFilter(imgSrc image.Image) image.Image {
 
 	// Create a new grayscale image
@@ -28,4 +33,40 @@ func GrayFilter(imgSrc image.Image) image.Image {
 	}
 
 	return grayScale
+}
+
+type portion struct {
+	id  int
+	img image.Image
+}
+
+/*
+ConcurrentGrayFilter Return the grayscale of an image and compute concurrently
+*/
+func ConcurrentGrayFilter(imgSrc image.Image) image.Image {
+
+	out := make(chan portion)
+	slices := imagetools.Crop(imgSrc, 4)
+
+	for i := 0; i < 4; i++ {
+		go gsWorker(i, out, slices[i][0])
+	}
+
+	for i := 0; i < 4; i++ {
+		slice := <-out
+		slices[slice.id][0] = slice.img
+	}
+
+	imgEnd := imagetools.Rebuild(slices)
+
+	return imgEnd
+
+}
+
+func gsWorker(id int, out chan portion, img image.Image) {
+	imgOut := GrayFilter(img)
+	var ret portion
+	ret.img = imgOut
+	ret.id = id
+	out <- ret
 }
