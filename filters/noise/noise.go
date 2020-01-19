@@ -111,3 +111,34 @@ func meanWorker(id int, p int, out chan portion, img image.Image) {
 	ret.id = id
 	out <- ret
 }
+
+/*
+ConcurrentFmediane Return the image with less noise and compute concurrently
+*/
+func ConcurrentFmediane(imgSrc image.Image, p int) image.Image {
+
+	out := make(chan portion)
+	slices := imagetools.Crop(imgSrc, 4)
+
+	for i := 0; i < 4; i++ {
+		go meanWorker(i, p, out, slices[i][0])
+	}
+
+	for i := 0; i < 4; i++ {
+		slice := <-out
+		slices[slice.id][0] = slice.img
+	}
+
+	imgEnd := imagetools.Rebuild(slices)
+
+	return imgEnd
+
+}
+
+func medianeWorker(id int, p int, out chan portion, img image.Image) {
+	imgOut := Fmediane(img, p)
+	var ret portion
+	ret.img = imgOut
+	ret.id = id
+	out <- ret
+}
