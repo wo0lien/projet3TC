@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"strconv"
 
 	"github.com/wo0lien/projet3TC/filters/edge"
 	"github.com/wo0lien/projet3TC/filters/grayscale"
@@ -21,43 +20,12 @@ func main() {
 	var _ = edge.FSobel
 	var _ = grayscale.GrayFilter
 
-	useGrayScaleFilter()
-	//edgeFilter()
-
-}
-
-func useGrayScaleFilter() {
-	imgSrc, err := imagetools.Open("epice.png")
-
+	imgSrc, err := imagetools.Open("assets/hubble.png")
 	if err != nil {
 		log.Printf("error loading file")
 	}
+    var _ = grayscale.ConcurrentGrayFilter(imgSrc)
+	
+    //imagetools.Export(imgOut, "hubblegray.png")
 
-	slices := imagetools.Crop(imgSrc, 4)
-
-	for i := 0; i < 4; i++ {
-		log.Printf("one filter")
-		slices[i][0] = grayscale.GrayFilter(slices[i][0])
-
-		imagetools.Export(slices[i][0], "e"+strconv.Itoa(i)+".png")
-	}
-	imgEnd := imagetools.Rebuild(slices)
-	imagetools.Export(imgEnd, "export.png")
-}
-
-func edgeFilter() {
-	imgSrc, err := imagetools.Open("edges.png")
-
-	if err != nil {
-		log.Printf("error loading file")
-	}
-
-	slices := imagetools.Crop(imgSrc, 4)
-
-	for i := 0; i < 4; i++ {
-		log.Printf("one filter")
-		slices[i][0] = edge.FSobel(slices[i][0])
-	}
-	imgEnd := imagetools.Rebuild(slices)
-	imagetools.Export(imgEnd, "export.png")
 }

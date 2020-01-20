@@ -7,7 +7,6 @@ import (
 	_ "image/jpeg" //for test
 	_ "image/png"  //for test
 	"math"
-	"strconv"
 
 	"github.com/wo0lien/projet3TC/imagetools"
 )
@@ -101,7 +100,6 @@ func ConcurrentEdgeFilter(imgSrc image.Image) image.Image {
 
 func edgWorker(id int, out chan portion, img image.Image) {
 	imgOut := FSobel(img)
-	imagetools.Export(imgOut, "slice"+strconv.Itoa(id)+".png")
 	var ret portion
 	ret.img = imgOut
 	ret.id = id

@@ -1,3 +1,4 @@
 *.jpg
 *.png
 !assets/*.png
+assets/hubble.png

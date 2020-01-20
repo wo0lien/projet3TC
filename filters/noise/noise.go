@@ -121,7 +121,7 @@ func ConcurrentFmediane(imgSrc image.Image, p int) image.Image {
 	slices := imagetools.Crop(imgSrc, 4)
 
 	for i := 0; i < 4; i++ {
-		go meanWorker(i, p, out, slices[i][0])
+		go medianeWorker(i, p, out, slices[i][0])
 	}
 
 	for i := 0; i < 4; i++ {

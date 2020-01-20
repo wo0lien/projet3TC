@@ -6,7 +6,7 @@ import (
 )
 
 func TestGrayFilter(t *testing.T) {
-	img, err := imagetools.Open("../../epice.png")
+	img, err := imagetools.Open("../../assets/epice.png")
 
 	if err != nil {
 		t.Error("open does not work")
@@ -18,7 +18,7 @@ func TestGrayFilter(t *testing.T) {
 }
 
 func TestConcurrentGrayFilter(t *testing.T) {
-	img, err := imagetools.Open("../../epice.png")
+	img, err := imagetools.Open("../../assets/hubble.png")
 
 	if err != nil {
 		t.Error("open does not work")
