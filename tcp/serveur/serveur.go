@@ -20,13 +20,13 @@ const bufferSize = 1024
 /*
 StartServer function makes the server listen on the desired port
 */
-func StartServer(port int) {
+func StartServer(port int, host string, concurrent bool) {
 
 	var _ = edge.FSobel
 	var _ = grayscale.GrayFilter
 	var _ = noise.Fmean
 
-	listener, err := net.Listen("tcp", "127.0.0.1:"+strconv.Itoa(port))
+	listener, err := net.Listen("tcp", host+":"+strconv.Itoa(port))
 	if err != nil {
 		log.Fatal("tcp server listener error:", err)
 	}
@@ -37,11 +37,11 @@ func StartServer(port int) {
 			log.Fatal("tcp server accept error", err)
 		}
 
-		go handleConnection(conn)
+		go handleConnection(conn, concurrent)
 	}
 }
 
-func handleConnection(connection net.Conn) {
+func handleConnection(connection net.Conn, concurrent bool) {
 
 	fmt.Println("Handling connection")
 
@@ -58,12 +58,23 @@ func handleConnection(connection net.Conn) {
 	}
 
 	var imgFiltered image.Image
-	// apply filter
-	switch filter {
-	case "1":
-		imgFiltered = grayscale.ConcurrentGrayFilter(img)
-	case "2":
-		imgFiltered = edge.ConcurrentEdgeFilter(img)
+
+	if concurrent == true {
+		// apply filter
+		switch filter {
+		case "1":
+			imgFiltered = grayscale.ConcurrentGrayFilter(img)
+		case "2":
+			imgFiltered = edge.ConcurrentEdgeFilter(img)
+		}
+	} else {
+		// apply filter
+		switch filter {
+		case "1":
+			imgFiltered = grayscale.GrayFilter(img)
+		case "2":
+			imgFiltered = edge.FSobel(img)
+		}
 	}
 
 	imgFilteredFileName := "f_" + fileName
@@ -125,6 +136,7 @@ func sendFileBack(fileName string, connection net.Conn) {
 		fmt.Println(err)
 		return
 	}
+	defer file.Close()
 	fileInfo, err := file.Stat()
 	if err != nil {
 		fmt.Println(err)
