@@ -71,6 +71,8 @@ func handleConnection(connection net.Conn, concurrent bool) {
 		case "3":
 			imgFiltered = edge.ConcurrentEdgeFilter(img)
 		case "4":
+			imgFiltered= noise.ConcurrentFmediane(img, 3)
+		case "5":
 			imgFiltered = noise.ConcurrentFmean(img, 3)
 		}
 	} else {
@@ -83,7 +85,9 @@ func handleConnection(connection net.Conn, concurrent bool) {
 		case "3":
 			imgFiltered = edge.FSobel(img)
 		case "4":
-			imgFiltered = noise.Fmean(img, 3)
+			imgFiltered = noise.Fmediane(img, 3)
+		case "5":
+			imgFiltered=noise.Fmean(img, 3)
 		}
 	}
 
