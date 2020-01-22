@@ -11,15 +11,13 @@ import (
 )
 
 const bufferSize = 1024
-const host = "127.0.0.1"
-const port = "8080"
 
 /*
 StartServer function makes the server listen on the desired port
 */
 func StartServer(port int) {
 
-	listener, err := net.Listen("tcp", "127.0.0.1"+string(port))
+	listener, err := net.Listen("tcp", "127.0.0.1:"+strconv.Itoa(port))
 	if err != nil {
 		log.Fatal("tcp server listener error:", err)
 	}
