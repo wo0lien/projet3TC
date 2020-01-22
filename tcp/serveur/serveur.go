@@ -7,17 +7,22 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"strings"
 )
 
-const BUFFERSIZE := 1024
+const bufferSize = 1024
+const host = "127.0.0.1"
+const port = "8080"
 
-func main() {
+/*
+StartServer function makes the server listen on the desired port
+*/
+func StartServer(port int) {
 
-	listener, err := net.Listen("tcp", "127.0.0.1:8080")
+	listener, err := net.Listen("tcp", "127.0.0.1"+string(port))
 	if err != nil {
 		log.Fatal("tcp server listener error:", err)
 	}
-	log.Println("Server started")
 
 	for {
 		conn, err := listener.Accept()
@@ -29,37 +34,40 @@ func main() {
 	}
 }
 
-func handleConnection(conn net.Conn) {
-	if err != nil {
-		panic(err)
-	}
-	defer conn.Close()
-	fmt.Println("Connected to server, start receiving the file name and file size")
+func handleConnection(connection net.Conn) string {
+
+	defer connection.Close()
+	fmt.Println("Connected to client, start receiving the file name, file size and filter")
+	bufferFilter := make([]byte, 10)
 	bufferFileName := make([]byte, 64)
 	bufferFileSize := make([]byte, 10)
-	
-	conn.Read(bufferFileSize)
+
+	connection.Read(bufferFilter)
+	filter := strings.Trim(string(bufferFilter), ":")
+
+	connection.Read(bufferFileSize)
 	fileSize, _ := strconv.ParseInt(strings.Trim(string(bufferFileSize), ":"), 10, 64)
-	
-	conn.Read(bufferFileName)
+
+	connection.Read(bufferFileName)
 	fileName := strings.Trim(string(bufferFileName), ":")
-	
+
 	newFile, err := os.Create(fileName)
-	
+
 	if err != nil {
 		panic(err)
 	}
 	defer newFile.Close()
 	var receivedBytes int64
-	
+
 	for {
-		if (fileSize - receivedBytes) < BUFFERSIZE {
+		if (fileSize - receivedBytes) < bufferSize {
 			io.CopyN(newFile, connection, (fileSize - receivedBytes))
-			conn.Read(make([]byte, (receivedBytes+BUFFERSIZE)-fileSize))
+			connection.Read(make([]byte, (receivedBytes+bufferSize)-fileSize))
 			break
 		}
-		io.CopyN(newFile, conn, BUFFERSIZE)
-		receivedBytes += BUFFERSIZE
+		io.CopyN(newFile, connection, bufferSize)
+		receivedBytes += bufferSize
 	}
-	fmt.Println("Received file completely!")
+	fmt.Println("Received file " + fileName + " completely!" + " and filter : " + filter)
+	return fileName
 }
