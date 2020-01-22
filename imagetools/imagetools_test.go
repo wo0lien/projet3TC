@@ -110,9 +110,9 @@ func TestCrop(t *testing.T) {
 }
 
 func TestCropChev(t *testing.T) {
-	img, _ := Open("../assets/test.png")
+	img, _ := Open("../assets/lines.png")
 
-	slices := CropChevauchement(img, 3, 30)
+	slices := CropChevauchement(img, 4, 10)
 
 	for i := range slices {
 		Export(slices[i][0], "slice"+strconv.Itoa(i)+".png")

@@ -19,7 +19,7 @@ func TestEdgeFilter(t *testing.T) {
 }
 
 func TestConcurrentEdgeFilter(t *testing.T) {
-	img, err := imagetools.Open("../../assets/edges.png")
+	img, err := imagetools.Open("../../assets/lines.png")
 
 	if err != nil {
 		t.Error("open does not work")

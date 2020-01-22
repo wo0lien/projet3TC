@@ -66,6 +66,8 @@ func handleConnection(connection net.Conn, concurrent bool) {
 			imgFiltered = grayscale.ConcurrentGrayFilter(img)
 		case "2":
 			imgFiltered = edge.ConcurrentEdgeFilter(img)
+		case "3":
+			imgFiltered = noise.ConcurrentFmediane(img, 3)
 		}
 	} else {
 		// apply filter
@@ -74,6 +76,8 @@ func handleConnection(connection net.Conn, concurrent bool) {
 			imgFiltered = grayscale.GrayFilter(img)
 		case "2":
 			imgFiltered = edge.FSobel(img)
+		case "3":
+			imgFiltered = noise.Fmean(img, 3)
 		}
 	}
 

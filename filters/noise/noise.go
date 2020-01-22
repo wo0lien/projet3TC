@@ -85,9 +85,9 @@ type portion struct {
 ConcurrentFmean Return the image with less noise and compute concurrently
 */
 func ConcurrentFmean(imgSrc image.Image, p int) image.Image {
-
+	ch := 2*(p*2)
 	out := make(chan portion)
-	slices := imagetools.Crop(imgSrc, 4)
+	slices := imagetools.CropChevauchement(imgSrc, 4, ch)
 
 	for i := 0; i < 4; i++ {
 		go meanWorker(i, p, out, slices[i][0])
@@ -98,7 +98,7 @@ func ConcurrentFmean(imgSrc image.Image, p int) image.Image {
 		slices[slice.id][0] = slice.img
 	}
 
-	imgEnd := imagetools.Rebuild(slices)
+	imgEnd := imagetools.RebuildChevauchement(slices, ch)
 
 	return imgEnd
 

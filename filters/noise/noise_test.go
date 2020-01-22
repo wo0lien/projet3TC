@@ -19,7 +19,7 @@ func TestMean(t *testing.T) {
 }
 
 func TestConcurrentMean(t *testing.T) {
-	img, err := imagetools.Open("../../assets/bruit2.png")
+	img, err := imagetools.Open("../../assets/lines.png")
 
 	if err != nil {
 		t.Error("open does not work")
