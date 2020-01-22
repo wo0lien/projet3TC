@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/wo0lien/projet3TC/filters/edge"
 	"github.com/wo0lien/projet3TC/filters/grayscale"
+	"github.com/wo0lien/projet3TC/filters/negative"
 	"github.com/wo0lien/projet3TC/filters/noise"
 	"github.com/wo0lien/projet3TC/imagetools"
 	"image"
@@ -25,6 +26,7 @@ func StartServer(port int, host string, concurrent bool) {
 	var _ = edge.FSobel
 	var _ = grayscale.GrayFilter
 	var _ = noise.Fmean
+	var _ = negative.NegativeFilter
 
 	listener, err := net.Listen("tcp", host+":"+strconv.Itoa(port))
 	if err != nil {
@@ -63,20 +65,24 @@ func handleConnection(connection net.Conn, concurrent bool) {
 		// apply filter
 		switch filter {
 		case "1":
-			imgFiltered = grayscale.ConcurrentGrayFilter(img)
+			imgFiltered = negative.ConcurrentNegFilter(img)
 		case "2":
-			imgFiltered = edge.ConcurrentEdgeFilter(img)
+			imgFiltered = grayscale.ConcurrentGrayFilter(img)
 		case "3":
+			imgFiltered = edge.ConcurrentEdgeFilter(img)
+		case "4":
 			imgFiltered = noise.ConcurrentFmediane(img, 3)
 		}
 	} else {
 		// apply filter
 		switch filter {
 		case "1":
-			imgFiltered = grayscale.GrayFilter(img)
+			imgFiltered = negative.NegativeFilter(img)
 		case "2":
-			imgFiltered = edge.FSobel(img)
+			imgFiltered = grayscale.GrayFilter(img)
 		case "3":
+			imgFiltered = edge.FSobel(img)
+		case "4":
 			imgFiltered = noise.Fmean(img, 3)
 		}
 	}
