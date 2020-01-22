@@ -10,24 +10,23 @@ import (
 )
 
 // Fmediane utile
-func Fmediane(in image.Image, p int) image.Image {
-	loadedImage := in
+func Fmediane(img image.Image, p int) image.Image {
 
-	b := loadedImage.Bounds()
-	imgWidth := b.Max.X
-	imgHeight := b.Max.Y
-	myImage := image.NewRGBA(image.Rect(0, 0, imgWidth-2*p, imgHeight-2*p))
-	t := (2*p + 1) * (2*p + 1)
+	b := img.Bounds()
+	minx, miny := b.Min.X, b.Min.Y
+	maxx, maxy := b.Max.X, b.Max.Y
+	myImage := image.NewRGBA(image.Rect(minx, miny, maxx-2*p, maxy-2*p))
+	t:=(2*p+1)*(2*p+1)
 	var red = make([]uint32, t)
 	var green = make([]uint32, t)
 	var blue = make([]uint32, t)
 
-	for cpt := p; cpt < imgWidth-p; cpt++ {
-		for cpt2 := p; cpt2 < imgHeight-p; cpt2++ {
+	for cpt := minx + p; cpt < maxx-p; cpt++ {
+		for cpt2 := miny + p; cpt2 < maxy-p; cpt2++ {
 			i := 0
 			for cptwi := -p; cptwi < p+1; cptwi++ {
 				for cpthe := -p; cpthe < p+1; cpthe++ {
-					red[i], green[i], blue[i], _ = loadedImage.At(cpt+cptwi, cpt2+cpthe).RGBA()
+					red[i], green[i], blue[i], _ = img.At(cpt+cptwi, cpt2+cpthe).RGBA()
 					i++
 				}
 			}
@@ -37,10 +36,10 @@ func Fmediane(in image.Image, p int) image.Image {
 			ind := uint(math.Floor(float64(t) / 2))
 			valrouge, valvert, valbleu := uint8(red[ind]*255/65535), uint8(green[ind]*255/65535), uint8(blue[ind]*255/65535)
 			myImage.Set(cpt-p, cpt2-p, color.RGBA{valrouge, valvert, valbleu, 255})
+
 		}
 	}
 	return myImage
-
 }
 
 // Fmean utile
@@ -116,9 +115,9 @@ func meanWorker(id int, p int, out chan portion, img image.Image) {
 ConcurrentFmediane Return the image with less noise and compute concurrently
 */
 func ConcurrentFmediane(imgSrc image.Image, p int) image.Image {
-
+	ch := 2*(p*2)
 	out := make(chan portion)
-	slices := imagetools.Crop(imgSrc, 4)
+	slices := imagetools.CropChevauchement(imgSrc, 4, ch)
 
 	for i := 0; i < 4; i++ {
 		go medianeWorker(i, p, out, slices[i][0])
@@ -129,10 +128,9 @@ func ConcurrentFmediane(imgSrc image.Image, p int) image.Image {
 		slices[slice.id][0] = slice.img
 	}
 
-	imgEnd := imagetools.Rebuild(slices)
+	imgEnd := imagetools.RebuildChevauchement(slices, ch)
 
 	return imgEnd
-
 }
 
 func medianeWorker(id int, p int, out chan portion, img image.Image) {
