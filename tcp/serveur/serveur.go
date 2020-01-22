@@ -2,6 +2,11 @@ package serveur
 
 import (
 	"fmt"
+	"github.com/wo0lien/projet3TC/filters/edge"
+	"github.com/wo0lien/projet3TC/filters/grayscale"
+	"github.com/wo0lien/projet3TC/filters/noise"
+	"github.com/wo0lien/projet3TC/imagetools"
+	"image"
 	"io"
 	"log"
 	"net"
@@ -16,6 +21,10 @@ const bufferSize = 1024
 StartServer function makes the server listen on the desired port
 */
 func StartServer(port int) {
+
+	var _ = edge.FSobel
+	var _ = grayscale.GrayFilter
+	var _ = noise.Fmean
 
 	listener, err := net.Listen("tcp", "127.0.0.1:"+strconv.Itoa(port))
 	if err != nil {
@@ -32,10 +41,46 @@ func StartServer(port int) {
 	}
 }
 
-func handleConnection(connection net.Conn) string {
+func handleConnection(connection net.Conn) {
+
+	fmt.Println("Handling connection")
 
 	defer connection.Close()
-	fmt.Println("Connected to client, start receiving the file name, file size and filter")
+
+	fileName, filter := receiveFile(connection)
+
+	//----------------------Traitement de l'image reçue------------------
+
+	img, err := imagetools.Open(fileName)
+
+	if err != nil {
+		panic(err)
+	}
+
+	var imgFiltered image.Image
+	// apply filter
+	switch filter {
+	case "1":
+		imgFiltered = grayscale.ConcurrentGrayFilter(img)
+	case "2":
+		imgFiltered = edge.ConcurrentEdgeFilter(img)
+	}
+
+	imgFilteredFileName := "f_" + fileName
+
+	imagetools.Export(imgFiltered, imgFilteredFileName)
+
+	//----------------------Renvoi -----------------------------------
+
+	sendFileBack(imgFilteredFileName, connection)
+
+	fmt.Println("Closing the connnection")
+
+}
+
+func receiveFile(connection net.Conn) (string, string) {
+
+	fmt.Println("Start receiving the file name, file size and filter")
 	bufferFilter := make([]byte, 10)
 	bufferFileName := make([]byte, 64)
 	bufferFileSize := make([]byte, 10)
@@ -66,6 +111,50 @@ func handleConnection(connection net.Conn) string {
 		io.CopyN(newFile, connection, bufferSize)
 		receivedBytes += bufferSize
 	}
-	fmt.Println("Received file " + fileName + " completely!" + " and filter : " + filter)
-	return fileName
+	fmt.Println("Received file " + fileName + ", client want to compute on it with filter : " + filter)
+	return fileName, filter
+}
+
+func sendFileBack(fileName string, connection net.Conn) {
+	//---------------------Renvoi de l'image-----------------------------
+
+	fmt.Println("Starting to send back file")
+
+	file, err := os.Open(fileName)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fileInfo, err := file.Stat()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fileBackSize := fillString(strconv.FormatInt(fileInfo.Size(), 10), 10)
+	fileBackName := fillString(fileInfo.Name(), 64)
+	fmt.Println("Sending filename and filesize")
+	connection.Write([]byte(fileBackSize))
+	connection.Write([]byte(fileBackName))
+	sendBuffer := make([]byte, bufferSize)
+	fmt.Println("Start sending file")
+	for {
+		_, err = file.Read(sendBuffer)
+		if err == io.EOF {
+			break
+		}
+		connection.Write(sendBuffer)
+	}
+	fmt.Println("File has been sent")
+}
+
+func fillString(returnString string, toLength int) string {
+	for {
+		lengtString := len(returnString)
+		if lengtString < toLength {
+			returnString = returnString + ":"
+			continue
+		}
+		break
+	}
+	return returnString
 }
