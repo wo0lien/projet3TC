@@ -77,28 +77,6 @@ func TestRebuild(t *testing.T) {
 	Export(composed, "composed.png")
 }
 
-func TestCut(t *testing.T) {
-	img, _ := Open("../assets/test.png")
-	bounds := img.Bounds()
-	w, h := bounds.Max.X, bounds.Max.Y
-
-	slices := Cut(img, 3)
-
-	for i := range slices {
-		Export(slices[i][0], "slice"+strconv.Itoa(i)+".png")
-	}
-
-	lastSlice := slices[len(slices)-1][0]
-	b := lastSlice.Bounds()
-
-	if w != b.Max.X {
-		t.Error("Pas la bonne largeur")
-	}
-	if h != b.Max.Y {
-		t.Error("Pas la bonne hauteur")
-	}
-}
-
 func TestCrop(t *testing.T) {
 	img, _ := Open("../assets/test.png")
 

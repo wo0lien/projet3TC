@@ -2,6 +2,7 @@ package serveur
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"github.com/wo0lien/projet3TC/filters/edge"
 	"github.com/wo0lien/projet3TC/filters/grayscale"
 	"github.com/wo0lien/projet3TC/filters/negative"
@@ -30,13 +31,15 @@ func StartServer(port int, host string, concurrent bool) {
 
 	listener, err := net.Listen("tcp", host+":"+strconv.Itoa(port))
 	if err != nil {
+		// le serveur stop si cette erreur est raised
 		log.Fatal("tcp server listener error:", err)
 	}
 
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			log.Fatal("tcp server accept error", err)
+			fmt.Printf("Error: %+v", err)
+			continue
 		}
 
 		go handleConnection(conn, concurrent)
@@ -49,14 +52,20 @@ func handleConnection(connection net.Conn, concurrent bool) {
 
 	defer connection.Close()
 
-	fileName, filter := receiveFile(connection)
+	fileName, filter, err := receiveFile(connection)
+
+	if err != nil {
+		fmt.Printf("Error: %+v", err)
+		return
+	}
 
 	//----------------------Traitement de l'image reçue------------------
 
 	img, err := imagetools.Open(fileName)
 
 	if err != nil {
-		panic(err)
+		fmt.Printf("Error: %+v", err)
+		return
 	}
 
 	var imgFiltered image.Image
@@ -71,7 +80,7 @@ func handleConnection(connection net.Conn, concurrent bool) {
 		case "3":
 			imgFiltered = edge.ConcurrentEdgeFilter(img)
 		case "4":
-			imgFiltered= noise.ConcurrentFmediane(img, 3)
+			imgFiltered = noise.ConcurrentFmediane(img, 3)
 		case "5":
 			imgFiltered = noise.ConcurrentFmean(img, 3)
 		}
@@ -87,23 +96,32 @@ func handleConnection(connection net.Conn, concurrent bool) {
 		case "4":
 			imgFiltered = noise.Fmediane(img, 3)
 		case "5":
-			imgFiltered=noise.Fmean(img, 3)
+			imgFiltered = noise.Fmean(img, 3)
 		}
 	}
 
 	imgFilteredFileName := "f_" + fileName
 
-	imagetools.Export(imgFiltered, imgFilteredFileName)
+	err = imagetools.Export(imgFiltered, imgFilteredFileName)
+
+	if err != nil {
+		fmt.Printf("Error: %+v", err)
+		return
+	}
 
 	//----------------------Renvoi -----------------------------------
 
-	sendFileBack(imgFilteredFileName, connection)
+	err = sendFileBack(imgFilteredFileName, connection)
+	if err != nil {
+		fmt.Printf("Error: %+v", err)
+		return
+	}
 
 	fmt.Println("Closing the connnection")
 
 }
 
-func receiveFile(connection net.Conn) (string, string) {
+func receiveFile(connection net.Conn) (string, string, error) {
 
 	fmt.Println("Start receiving the file name, file size and filter")
 	bufferFilter := make([]byte, 10)
@@ -114,7 +132,11 @@ func receiveFile(connection net.Conn) (string, string) {
 	filter := strings.Trim(string(bufferFilter), ":")
 
 	connection.Read(bufferFileSize)
-	fileSize, _ := strconv.ParseInt(strings.Trim(string(bufferFileSize), ":"), 10, 64)
+	fileSize, err := strconv.ParseInt(strings.Trim(string(bufferFileSize), ":"), 10, 64)
+
+	if err != nil {
+		return "", "", errors.Wrap(err, "File receiver failed with error :")
+	}
 
 	connection.Read(bufferFileName)
 	fileName := strings.Trim(string(bufferFileName), ":")
@@ -122,7 +144,7 @@ func receiveFile(connection net.Conn) (string, string) {
 	newFile, err := os.Create(fileName)
 
 	if err != nil {
-		panic(err)
+		return "", "", errors.Wrap(err, "File receiver failed with error :")
 	}
 	defer newFile.Close()
 	var receivedBytes int64
@@ -137,25 +159,26 @@ func receiveFile(connection net.Conn) (string, string) {
 		receivedBytes += bufferSize
 	}
 	fmt.Println("Received file " + fileName + ", client want to compute on it with filter : " + filter)
-	return fileName, filter
+	return fileName, filter, nil
 }
 
-func sendFileBack(fileName string, connection net.Conn) {
+func sendFileBack(fileName string, connection net.Conn) error {
 	//---------------------Renvoi de l'image-----------------------------
 
 	fmt.Println("Starting to send back file")
 
 	file, err := os.Open(fileName)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return errors.Wrap(err, "File sender failed with error :")
 	}
 	defer file.Close()
+
 	fileInfo, err := file.Stat()
+
 	if err != nil {
-		fmt.Println(err)
-		return
+		return errors.Wrap(err, "File sender failed with error :")
 	}
+
 	fileBackSize := fillString(strconv.FormatInt(fileInfo.Size(), 10), 10)
 	fileBackName := fillString(fileInfo.Name(), 64)
 	fmt.Println("Sending filename and filesize")
@@ -171,6 +194,7 @@ func sendFileBack(fileName string, connection net.Conn) {
 		connection.Write(sendBuffer)
 	}
 	fmt.Println("File has been sent")
+	return nil
 }
 
 func fillString(returnString string, toLength int) string {

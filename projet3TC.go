@@ -9,10 +9,11 @@ import (
 func main() {
 
 	port := flag.Int("p", 8080, "Port du serveur")
-	host := flag.String("h", "localhost", "ip du serveur si on veut le lancer sur un reseau")
+	host := flag.String("h", "localhost", "Ip du serveur si on veut le lancer sur un reseau")
 	concurrent := flag.Bool("c", false, "Choisit si les filtres doivent etre concurrents ou pas")
 	flag.Parse()
 
+	//simply log if the server is concurrent or not
 	fmt.Println("Starting the server")
 	if *concurrent {
 		fmt.Println("concurrent")

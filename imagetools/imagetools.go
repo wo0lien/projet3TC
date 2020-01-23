@@ -2,54 +2,13 @@ package imagetools
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"image"
 	"image/draw"
 	"image/png"
-	"log"
 	"math"
 	"os"
-
-	"github.com/oliamb/cutter"
 )
-
-/*
-Cut slice image using the computer CPUNumber
-return a slice of images
-*/
-func Cut(img image.Image, nbSplit int) [][]image.Image {
-
-	//traitements sur l'image
-	bounds := img.Bounds()
-	w, h := bounds.Max.X, bounds.Max.Y
-
-	slice := int(math.Floor(float64(h) / float64(nbSplit)))
-
-	slices := make([][]image.Image, nbSplit+1)
-	for y := range slices {
-		slices[y] = make([]image.Image, 1)
-	}
-
-	cpt := 0
-	for y := 0; y < h; y = y + slice {
-		// create an image copy of the slice
-		imgSliced, err := cutter.Crop(img, cutter.Config{
-			Width:   w,
-			Height:  min(slice, h-y),
-			Anchor:  image.Point{0, y},
-			Options: cutter.Copy,
-		})
-
-		if err != nil {
-			log.Printf("Error while slicing the image")
-			panic(err.Error())
-		}
-
-		slices[cpt][0] = imgSliced
-		cpt++
-	}
-
-	return slices
-}
 
 /*
 Rebuild function to create a big image with smaller ones
@@ -137,14 +96,15 @@ func Open(filepath string) (image.Image, error) {
 	infile, err := os.Open(filepath)
 
 	if err != nil {
-		log.Printf("failed opening file: %s", err)
-		return nil, err
+		error := errors.Wrap(err, "Open failed with error :")
+		return nil, error
 	}
 	defer infile.Close()
 
 	img, _, err := image.Decode(infile)
 	if err != nil {
-		return nil, err
+		error := errors.Wrap(err, "Open failed with error :")
+		return nil, error
 	}
 	return img, nil
 }
@@ -152,17 +112,24 @@ func Open(filepath string) (image.Image, error) {
 /*
 Export create a png file based on the image file given
 */
-func Export(img image.Image, name string) {
+func Export(img image.Image, name string) error {
+
 	// Encode the grayscale image to the new file
 	newFileName := name
 	newfile, err := os.Create(newFileName)
 
 	if err != nil {
-		log.Printf("failed creating png output: %s", err)
-		panic(err.Error())
+		return errors.Wrap(err, "Export failed with error :")
 	}
 	defer newfile.Close()
-	png.Encode(newfile, img)
+
+	err = png.Encode(newfile, img)
+
+	if err != nil {
+		return errors.Wrap(err, "Export Failed with error :")
+	}
+
+	return nil
 }
 
 /*
@@ -192,7 +159,7 @@ func Crop(img image.Image, nbSplit int) [][]image.Image {
 
 		//create a subImage
 		rect := image.Rect(0, y, w, min(y+slice, h))
-		imgSliced, _ := cropImage(img, rect)
+		imgSliced := cropImage(img, rect)
 
 		slices[cpt][0] = imgSliced
 		cpt++
@@ -228,7 +195,7 @@ func CropChevauchement(img image.Image, nbSplit int, pixs int) [][]image.Image {
 
 		//create a subImage
 		rect := image.Rect(0, max(0, y-pixs), w, min(y+slice, h))
-		imgSliced, _ := cropImage(img, rect)
+		imgSliced := cropImage(img, rect)
 
 		slices[cpt][0] = imgSliced
 		cpt++
@@ -237,7 +204,7 @@ func CropChevauchement(img image.Image, nbSplit int, pixs int) [][]image.Image {
 	return slices
 }
 
-func cropImage(img image.Image, cropRect image.Rectangle) (cropImg image.Image, newImg bool) {
+func cropImage(img image.Image, cropRect image.Rectangle) (cropImg image.Image) {
 	//Interface for asserting whether `img`
 	//implements SubImage or not.
 	//This can be defined globally.
@@ -261,14 +228,12 @@ func cropImage(img image.Image, cropRect image.Rectangle) (cropImg image.Image, 
 			}
 		}
 		cropImg = rgbaImg
-		newImg = true
 	} else {
 		// Return an empty RGBA image
 		cropImg = &image.RGBA{}
-		newImg = true
 	}
 
-	return cropImg, newImg
+	return cropImg
 }
 
 func min(a, b int) int {
