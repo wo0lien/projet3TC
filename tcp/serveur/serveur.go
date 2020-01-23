@@ -35,6 +35,8 @@ func StartServer(port int, host string, concurrent bool) {
 		log.Fatal("tcp server listener error:", err)
 	}
 
+	defer listener.Close()
+
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
