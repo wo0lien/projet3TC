@@ -5,3 +5,5 @@ github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/wo0lien/projet3TC v0.0.0-20200122222703-e732eb5178a0 h1:E8WxOG6jkiG9EO+ScnEesPTLA5a/wUryoDVbdOrPbR0=
 github.com/wo0lien/projet3TC v0.0.0-20200122222703-e732eb5178a0/go.mod h1:Gn8BOffQLwBiyQs+w7lzCw0BjgdK8IzoVVCkQCL8sec=
+github.com/wo0lien/projet3TC v0.0.0-20200123110157-279ebdf93df6 h1:l3qvCTVdzX5P7XJlWlVExnN0/Vspjw7IX1FCLSt3TXc=
+github.com/wo0lien/projet3TC v0.0.0-20200123110157-279ebdf93df6/go.mod h1:FdFGniXlB/htd+tvIGslixVTWq1xvFRIZ3vvW4r3J/s=

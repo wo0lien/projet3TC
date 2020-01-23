@@ -119,14 +119,16 @@ func Export(img image.Image, name string) error {
 	newfile, err := os.Create(newFileName)
 
 	if err != nil {
-		return errors.Wrap(err, "Export failed with error :")
+		error := errors.Wrap(err, "Export failed with error :")
+		return error
 	}
 	defer newfile.Close()
 
 	err = png.Encode(newfile, img)
 
 	if err != nil {
-		return errors.Wrap(err, "Export Failed with error :")
+		error := errors.Wrap(err, "Export Failed with error :")
+		return error
 	}
 
 	return nil
