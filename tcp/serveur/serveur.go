@@ -83,6 +83,9 @@ func handleConnection(connection net.Conn, concurrent bool) {
 			imgFiltered = noise.ConcurrentFmediane(img, 3)
 		case "5":
 			imgFiltered = noise.ConcurrentFmean(img, 3)
+		default:
+			fmt.Println("Error: Not a good index")
+			return
 		}
 	} else {
 		// apply filter
@@ -97,6 +100,9 @@ func handleConnection(connection net.Conn, concurrent bool) {
 			imgFiltered = noise.Fmediane(img, 3)
 		case "5":
 			imgFiltered = noise.Fmean(img, 3)
+		default:
+			fmt.Println("Error: Not a good index")
+			return
 		}
 	}
 
