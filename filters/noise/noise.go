@@ -4,6 +4,7 @@ import (
 	"image"
 	"image/color"
 	"math"
+	"runtime"
 
 	"github.com/wo0lien/projet3TC/filters/uint32slice"
 	"github.com/wo0lien/projet3TC/imagetools"
@@ -84,15 +85,16 @@ type portion struct {
 ConcurrentFmean Return the image with less noise and compute concurrently
 */
 func ConcurrentFmean(imgSrc image.Image, p int) image.Image {
-	ch := 2*(p*2)
+	ngo:=runtime.NumCPU()
+	ch := (ngo-2)*(p*2)
 	out := make(chan portion)
-	slices := imagetools.CropChevauchement(imgSrc, 4, ch)
+	slices := imagetools.CropChevauchement(imgSrc, ngo, ch)
 
-	for i := 0; i < 4; i++ {
+	for i := 0; i < ngo; i++ {
 		go meanWorker(i, p, out, slices[i][0])
 	}
 
-	for i := 0; i < 4; i++ {
+	for i := 0; i < ngo; i++ {
 		slice := <-out
 		slices[slice.id][0] = slice.img
 	}
@@ -115,15 +117,16 @@ func meanWorker(id int, p int, out chan portion, img image.Image) {
 ConcurrentFmediane Return the image with less noise and compute concurrently
 */
 func ConcurrentFmediane(imgSrc image.Image, p int) image.Image {
-	ch := 2*(p*2)
+	ngo:=runtime.NumCPU()
+	ch := (ngo-2)*(p*2)
 	out := make(chan portion)
-	slices := imagetools.CropChevauchement(imgSrc, 4, ch)
+	slices := imagetools.CropChevauchement(imgSrc, ngo, ch)
 
-	for i := 0; i < 4; i++ {
+	for i := 0; i < ngo; i++ {
 		go medianeWorker(i, p, out, slices[i][0])
 	}
 
-	for i := 0; i < 4; i++ {
+	for i := 0; i < ngo; i++ {
 		slice := <-out
 		slices[slice.id][0] = slice.img
 	}

@@ -6,7 +6,7 @@ import (
 )
 
 func TestNegFilter(t *testing.T) {
-	img, err := imagetools.Open("../../assets/epice.png")
+	img, err := imagetools.Open("../../assets/lignes.png")
 
 	if err != nil {
 		t.Error("open does not work")
@@ -18,11 +18,12 @@ func TestNegFilter(t *testing.T) {
 }
 
 func TestConcurrentNegFilter(t *testing.T) {
-	img, err := imagetools.Open("../../assets/epice.png")
+	img, err := imagetools.Open("../../assets/hudf.png")
 
 	if err != nil {
 		t.Error("open does not work")
 	}
+
 
 	result := ConcurrentNegFilter(img)
 

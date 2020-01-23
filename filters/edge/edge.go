@@ -7,6 +7,7 @@ import (
 	_ "image/jpeg" //for test
 	_ "image/png"  //for test
 	"math"
+	"runtime"
 
 	"github.com/wo0lien/projet3TC/imagetools"
 )
@@ -79,15 +80,15 @@ type portion struct {
 ConcurrentEdgeFilter Return the grayscale of an image and compute concurrently
 */
 func ConcurrentEdgeFilter(imgSrc image.Image) image.Image {
-
+	ngo:=runtime.NumCPU()
 	out := make(chan portion)
-	slices := imagetools.CropChevauchement(imgSrc, 4, 10) //on laisse 5 pixels de chevauchement
+	slices := imagetools.CropChevauchement(imgSrc, ngo, 10) //on laisse 5 pixels de chevauchement
 
-	for i := 0; i < 4; i++ {
+	for i := 0; i < ngo; i++ {
 		go edgWorker(i, out, slices[i][0])
 	}
 
-	for i := 0; i < 4; i++ {
+	for i := 0; i < ngo; i++ {
 		slice := <-out
 		slices[slice.id][0] = slice.img
 	}

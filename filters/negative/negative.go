@@ -4,6 +4,7 @@ import (
 	"github.com/wo0lien/projet3TC/imagetools"
 	"image"
 	"image/color"
+	"runtime"
 )
 
 /*
@@ -39,15 +40,15 @@ type portion struct {
 ConcurrentGrayFilter Return the grayscale of an image and compute concurrently
 */
 func ConcurrentNegFilter(imgSrc image.Image) image.Image {
-
+	ngo:=runtime.NumCPU()
 	out := make(chan portion)
-	slices := imagetools.Crop(imgSrc, 4)
+	slices := imagetools.Crop(imgSrc, ngo)
 
-	for i := 0; i < 4; i++ {
+	for i := 0; i < ngo; i++ {
 		go negWorker(i, out, slices[i][0])
 	}
 
-	for i := 0; i < 4; i++ {
+	for i := 0; i < ngo; i++ {
 		slice := <-out
 		slices[slice.id][0] = slice.img
 	}
